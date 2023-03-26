@@ -7,4 +7,4 @@ Copiado de [SharpTreeView](https://github.com/icsharpcode/SharpDevelop/tree/mast
 
 Ejemplo:
 
-![Ejemplo](help/images/Sample.png)
+![Ejemplo](/help/images/Sample.png)
