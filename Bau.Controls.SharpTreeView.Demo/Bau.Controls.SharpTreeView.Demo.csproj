@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Images\File.png" />
+    <None Remove="Images\Folder.png" />
+    <None Remove="Images\FolderOpened.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bau.Controls.SharpTreeView\Bau.Controls.SharpTreeView.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\File.png" />
+    <Resource Include="Images\Folder.png" />
+    <Resource Include="Images\FolderOpened.png" />
+  </ItemGroup>
+
+</Project>

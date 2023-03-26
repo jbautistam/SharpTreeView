@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33424.131
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bau.Controls.SharpTreeView", "Bau.Controls.SharpTreeView\Bau.Controls.SharpTreeView.csproj", "{C32BC719-E57B-49D9-B9EE-33C131BE1D60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bau.Controls.SharpTreeView.Demo", "Bau.Controls.SharpTreeView.Demo\Bau.Controls.SharpTreeView.Demo.csproj", "{023C8E4E-1458-4904-AC09-C8D4E44BFE8D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C32BC719-E57B-49D9-B9EE-33C131BE1D60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C32BC719-E57B-49D9-B9EE-33C131BE1D60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C32BC719-E57B-49D9-B9EE-33C131BE1D60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C32BC719-E57B-49D9-B9EE-33C131BE1D60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{023C8E4E-1458-4904-AC09-C8D4E44BFE8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{023C8E4E-1458-4904-AC09-C8D4E44BFE8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{023C8E4E-1458-4904-AC09-C8D4E44BFE8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{023C8E4E-1458-4904-AC09-C8D4E44BFE8D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D2903A0B-7558-4A25-A43E-2660D690CC19}
+	EndGlobalSection
+EndGlobal
