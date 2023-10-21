@@ -144,15 +144,9 @@ namespace Bau.Controls.SharpTreeView
 			}
 		}
 		
-		protected override DependencyObject GetContainerForItemOverride()
-		{
-			return new SharpTreeViewItem();
-		}
+		protected override DependencyObject GetContainerForItemOverride() => new SharpTreeViewItem();
 
-		protected override bool IsItemItsOwnContainerOverride(object item)
-		{
-			return item is SharpTreeViewItem;
-		}
+		protected override bool IsItemItsOwnContainerOverride(object item) => item is SharpTreeViewItem;
 
 		protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
 		{
