@@ -13,25 +13,28 @@ namespace Bau.Controls.SharpTreeView
 {
     public partial class SharpTreeNode : INotifyPropertyChanged
 	{
-		SharpTreeNodeCollection modelChildren;
+		private SharpTreeNodeCollection modelChildren;
 		internal SharpTreeNode modelParent;
-		bool isVisible = true;
+		private bool isVisible = true;
 		
 		void UpdateIsVisible(bool parentIsVisible, bool updateFlattener)
 		{
 			bool newIsVisible = parentIsVisible && !isHidden;
-			if (isVisible != newIsVisible) {
+			if (isVisible != newIsVisible) 
+			{
 				isVisible = newIsVisible;
 				
 				// invalidate the augmented data
 				SharpTreeNode node = this;
-				while (node != null && node.totalListLength >= 0) {
+				while (node != null && node.totalListLength >= 0) 
+				{
 					node.totalListLength = -1;
 					node = node.listParent;
 				}
 				// Remember the removed nodes:
 				List<SharpTreeNode> removedNodes = null;
-				if (updateFlattener && !newIsVisible) {
+				if (updateFlattener && !newIsVisible) 
+				{
 					removedNodes = VisibleDescendantsAndSelf().ToList();
 				}
 				// also update the model children:
@@ -42,18 +45,22 @@ namespace Bau.Controls.SharpTreeView
 					CheckRootInvariants();
 				
 				// Tell the flattener about the removed nodes:
-				if (removedNodes != null) {
+				if (removedNodes != null) 
+				{
 					var flattener = GetListRoot().TreeFlattener;
-					if (flattener != null) {
+					if (flattener != null) 
+					{
 						flattener.NodesRemoved(GetVisibleIndexForNode(this), removedNodes);
 						foreach (var n in removedNodes)
 							n.OnIsVisibleChanged();
 					}
 				}
 				// Tell the flattener about the new nodes:
-				if (updateFlattener && newIsVisible) {
+				if (updateFlattener && newIsVisible) 
+				{
 					var flattener = GetListRoot().TreeFlattener;
-					if (flattener != null) {
+					if (flattener != null) 
+					{
 						flattener.NodesInserted(GetVisibleIndexForNode(this), VisibleDescendantsAndSelf());
 						foreach (var n in VisibleDescendantsAndSelf())
 							n.OnIsVisibleChanged();
@@ -66,45 +73,47 @@ namespace Bau.Controls.SharpTreeView
 		
 		void UpdateChildIsVisible(bool updateFlattener)
 		{
-			if (modelChildren != null && modelChildren.Count > 0) {
+			if (modelChildren != null && modelChildren.Count > 0) 
+			{
 				bool showChildren = isVisible && isExpanded;
-				foreach (SharpTreeNode child in modelChildren) {
+
+				foreach (SharpTreeNode child in modelChildren) 
+				{
 					child.UpdateIsVisible(showChildren, updateFlattener);
 				}
 			}
 		}
 		
-		public SharpTreeNode()
+		public SharpTreeNodeCollection Children 
 		{
-		}
-		
-		public SharpTreeNodeCollection Children {
-			get {
+			get 
+			{
 				if (modelChildren == null)
 					modelChildren = new SharpTreeNodeCollection(this);
 				return modelChildren;
 			}
 		}
 		
-		public SharpTreeNode Parent {
+		public SharpTreeNode Parent 
+		{
 			get { return modelParent; }
 		}
 		
 		public virtual object Text
 		{
-			get { return null; }
+			get { return string.Empty; }
 		}
 		
 		public virtual Brush Foreground {
 			get { return SystemColors.WindowTextBrush; }
 		}
 		
-		public virtual object Icon
+		public virtual object? Icon
 		{
 			get { return null; }
 		}
 		
-		public virtual object ToolTip
+		public virtual object? ToolTip
 		{
 			get { return null; }
 		}
@@ -232,12 +241,16 @@ namespace Bau.Controls.SharpTreeView
 			get { return isExpanded; }
 			set
 			{
-				if (isExpanded != value) {
+				if (isExpanded != value) 
+				{
 					isExpanded = value;
-					if (isExpanded) {
+					if (isExpanded) 
+					{
 						EnsureLazyChildren();
 						OnExpanding();
-					} else {
+					} 
+					else 
+					{
 						OnCollapsing();
 					}
 					UpdateChildIsVisible(true);
@@ -257,9 +270,11 @@ namespace Bau.Controls.SharpTreeView
 			set
 			{
 				lazyLoading = value;
-				if (lazyLoading) {
+				if (lazyLoading) 
+				{
 					IsExpanded = false;
-					if (canExpandRecursively) {
+					if (canExpandRecursively) 
+					{
 						canExpandRecursively = false;
 						RaisePropertyChanged("CanExpandRecursively");
 					}
@@ -275,7 +290,8 @@ namespace Bau.Controls.SharpTreeView
 		/// Gets whether this node can be expanded recursively.
 		/// If not overridden, this property returns false if the node is using lazy-loading, and true otherwise.
 		/// </summary>
-		public virtual bool CanExpandRecursively {
+		public virtual bool CanExpandRecursively 
+		{
 			get { return canExpandRecursively; }
 		}
 		
@@ -294,7 +310,8 @@ namespace Bau.Controls.SharpTreeView
 		/// </summary>
 		public void EnsureLazyChildren()
 		{
-			if (LazyLoading) {
+			if (LazyLoading) 
+			{
 				LazyLoading = false;
 				LoadChildren();
 			}
@@ -302,7 +319,7 @@ namespace Bau.Controls.SharpTreeView
 		
 		public IEnumerable<SharpTreeNode> Descendants()
 		{
-			return TreeTraversal.PreOrder(this.Children, n => n.Children);
+			return TreeTraversal.PreOrder(Children, n => n.Children);
 		}
 		
 		public IEnumerable<SharpTreeNode> DescendantsAndSelf()
@@ -312,7 +329,7 @@ namespace Bau.Controls.SharpTreeView
 		
 		internal IEnumerable<SharpTreeNode> VisibleDescendants()
 		{
-			return TreeTraversal.PreOrder(this.Children.Where(c => c.isVisible), n => n.Children.Where(c => c.isVisible));
+			return TreeTraversal.PreOrder(Children.Where(c => c.isVisible), n => n.Children.Where(c => c.isVisible));
 		}
 		
 		internal IEnumerable<SharpTreeNode> VisibleDescendantsAndSelf()
@@ -322,7 +339,7 @@ namespace Bau.Controls.SharpTreeView
 		
 		public IEnumerable<SharpTreeNode> Ancestors()
 		{
-			for (SharpTreeNode n = this.Parent; n != null; n = n.Parent)
+			for (SharpTreeNode n = Parent; n != null; n = n.Parent)
 				yield return n;
 		}
 		
@@ -344,7 +361,8 @@ namespace Bau.Controls.SharpTreeView
 			get { return isEditing; }
 			set
 			{
-				if (isEditing != value) {
+				if (isEditing != value) 
+				{
 					isEditing = value;
 					RaisePropertyChanged("IsEditing");
 				}
@@ -367,31 +385,42 @@ namespace Bau.Controls.SharpTreeView
 		
 		bool? isChecked;
 		
-		public bool? IsChecked {
+		public bool? IsChecked 
+		{
 			get { return isChecked; }
-			set {
+			set 
+			{
 				SetIsChecked(value, true);
 			}
 		}
 		
 		void SetIsChecked(bool? value, bool update)
 		{
-			if (isChecked != value) {
+			if (isChecked != value) 
+			{
 				isChecked = value;
 				
-				if (update) {
-					if (IsChecked != null) {
-						foreach (var child in Descendants()) {
-							if (child.IsCheckable) {
+				if (update) 
+				{
+					if (IsChecked != null) 
+					{
+						foreach (var child in Descendants()) 
+						{
+							if (child.IsCheckable) 
+							{
 								child.SetIsChecked(IsChecked, false);
 							}
 						}
 					}
 					
-					foreach (var parent in Ancestors()) {
-						if (parent.IsCheckable) {
-							if (!parent.TryValueForIsChecked(true)) {
-								if (!parent.TryValueForIsChecked(false)) {
+					foreach (var parent in Ancestors()) 
+					{
+						if (parent.IsCheckable) 
+						{
+							if (!parent.TryValueForIsChecked(true)) 
+							{
+								if (!parent.TryValueForIsChecked(false)) 
+								{
 									parent.SetIsChecked(null, false);
 								}
 							}
@@ -403,7 +432,7 @@ namespace Bau.Controls.SharpTreeView
 			}
 		}
 		
-		bool TryValueForIsChecked(bool? value)
+		private bool TryValueForIsChecked(bool? value)
 		{
 			if (Children.Where(n => n.IsCheckable).All(n => n.IsChecked == value)) {
 				SetIsChecked(value, false);
@@ -535,7 +564,8 @@ namespace Bau.Controls.SharpTreeView
 		public virtual void Cut(SharpTreeNode[] nodes)
 		{
 			var data = GetDataObject(nodes);
-			if (data != null) {
+			if (data != null) 
+			{
 				// TODO: default cut implementation should not immediately perform deletion, but use 'IsCut'
 				Clipboard.SetDataObject(data, copy: true);
 				DeleteWithoutConfirmation(nodes);
@@ -633,18 +663,23 @@ namespace Bau.Controls.SharpTreeView
 		
 		void RaiseIsLastChangedIfNeeded(NotifyCollectionChangedEventArgs e)
 		{
-			switch (e.Action) {
+			switch (e.Action) 
+			{
 				case NotifyCollectionChangedAction.Add:
-					if (e.NewStartingIndex == Children.Count - 1) {
-						if (Children.Count > 1) {
+					if (e.NewStartingIndex == Children.Count - 1) 
+					{
+						if (Children.Count > 1) 
+						{
 							Children[Children.Count - 2].RaisePropertyChanged("IsLast");
 						}
 						Children[Children.Count - 1].RaisePropertyChanged("IsLast");
 					}
 					break;
 				case NotifyCollectionChangedAction.Remove:
-					if (e.OldStartingIndex == Children.Count) {
-						if (Children.Count > 0) {
+					if (e.OldStartingIndex == Children.Count) 
+					{
+						if (Children.Count > 0) 
+						{
 							Children[Children.Count - 1].RaisePropertyChanged("IsLast");
 						}
 					}
@@ -656,9 +691,7 @@ namespace Bau.Controls.SharpTreeView
 		
 		public void RaisePropertyChanged(string name)
 		{
-			if (PropertyChanged != null) {
-				PropertyChanged(this, new PropertyChangedEventArgs(name));
-			}
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 		}
 
 		/// <summary>

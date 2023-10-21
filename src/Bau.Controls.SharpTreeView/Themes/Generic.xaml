@@ -4,6 +4,7 @@
     xmlns:local="clr-namespace:Bau.Controls.SharpTreeView"
 	xmlns:converters="clr-namespace:Bau.Controls.SharpTreeView.Converters"
 	xmlns:editors="clr-namespace:Bau.Controls.SharpTreeView.Editors"
+	xmlns:adorners="clr-namespace:Bau.Controls.SharpTreeView.Adorners"
 	>
 
 	<SolidColorBrush x:Key="ListBorder"
@@ -51,12 +52,12 @@
 		</Setter>
 	</Style>
 
-	<Style TargetType="{x:Type local:InsertMarker}">
+	<Style TargetType="{x:Type adorners:InsertMarker}">
 		<Setter Property="IsHitTestVisible"
                 Value="False" />
 		<Setter Property="Template">
 			<Setter.Value>
-				<ControlTemplate TargetType="{x:Type local:InsertMarker}">
+				<ControlTemplate TargetType="{x:Type adorners:InsertMarker}">
 					<Grid>
 						<Border VerticalAlignment="Center"
                                 Height="2"
@@ -232,7 +233,7 @@
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type local:SharpTreeNodeView}">
 					<Grid>
-						<local:LinesRenderer x:Name="linesRenderer"
+						<adorners:LinesRenderer x:Name="linesRenderer"
                                                ClipToBounds="True"
                                                Visibility="{Binding ShowLines, RelativeSource={RelativeSource AncestorType={x:Type local:SharpTreeView}}, Converter={converters:CollapsedWhenFalse}}" />
 						<StackPanel Orientation="Horizontal">

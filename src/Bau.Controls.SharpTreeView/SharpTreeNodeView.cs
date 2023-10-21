@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.ComponentModel;
 using Bau.Controls.SharpTreeView.Extensors;
+using Bau.Controls.SharpTreeView.Adorners;
 
 namespace Bau.Controls.SharpTreeView
 {
@@ -74,25 +74,26 @@ namespace Bau.Controls.SharpTreeView
 		/// <summary>
 		///		Responde al evento de propiedad modificada
 		/// </summary>
-		private void Node_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		private void Node_PropertyChanged(object? sender, PropertyChangedEventArgs e)
 		{
-			if (e.PropertyName == nameof(SharpTreeNode.IsEditing)) 
+			if (!string.IsNullOrWhiteSpace(e.PropertyName))
 			{
-				OnIsEditingChanged();
-			} 
-			else if (e.PropertyName == nameof(SharpTreeNode.IsLast)) 
-			{
-				if (ParentTreeView.ShowLines) 
+				if (e.PropertyName.Equals(nameof(SharpTreeNode.IsEditing), StringComparison.CurrentCultureIgnoreCase))
+					OnIsEditingChanged();
+				else if (Node is not null)
 				{
-					foreach (SharpTreeNode child in Node.VisibleDescendantsAndSelf()) 
-						if (ParentTreeView.ItemContainerGenerator.ContainerFromItem(child) is SharpTreeViewItem container && container is not null)
-							container.NodeView?.LinesRenderer?.InvalidateVisual();
+					if (e.PropertyName.Equals(nameof(SharpTreeNode.IsLast), StringComparison.CurrentCultureIgnoreCase)) 
+					{
+						if (ParentTreeView is not null && ParentTreeView.ShowLines) 
+							foreach (SharpTreeNode child in Node.VisibleDescendantsAndSelf()) 
+								if (ParentTreeView.ItemContainerGenerator.ContainerFromItem(child) is SharpTreeViewItem container && 
+										container is not null)
+									container.NodeView?.LinesRenderer?.InvalidateVisual();
+					} 
+					else if (e.PropertyName.Equals(nameof(SharpTreeNode.IsExpanded), StringComparison.CurrentCultureIgnoreCase) && 
+							Node.IsExpanded)
+						ParentTreeView?.HandleExpanding(Node);
 				}
-			} 
-			else if (e.PropertyName == nameof(SharpTreeNode.IsExpanded)) 
-			{
-				if (Node.IsExpanded)
-					ParentTreeView?.HandleExpanding(Node);
 			}
 		}
 
@@ -103,9 +104,9 @@ namespace Bau.Controls.SharpTreeView
 		{
 			if (Template.FindName("textEditorContainer", this) is Border textEditorContainer)
 			{
-				if (Node.IsEditing) 
+				if (Node?.IsEditing ?? false) 
 				{
-					if (CellEditor == null)
+					if (CellEditor is null)
 						textEditorContainer.Child = new Editors.EditTextBox() { Item = ParentItem };
 					else
 						textEditorContainer.Child = CellEditor;

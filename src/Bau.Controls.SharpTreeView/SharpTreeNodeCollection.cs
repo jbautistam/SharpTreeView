@@ -11,23 +11,20 @@ namespace Bau.Controls.SharpTreeView
 	/// </summary>
 	public sealed class SharpTreeNodeCollection : IList<SharpTreeNode>, INotifyCollectionChanged
 	{
-		readonly SharpTreeNode parent;
-		List<SharpTreeNode> list = new List<SharpTreeNode>();
+		public event NotifyCollectionChangedEventHandler? CollectionChanged;
 		bool isRaisingEvent;
 		
 		public SharpTreeNodeCollection(SharpTreeNode parent)
 		{
-			this.parent = parent;
+			Parent = parent;
 		}
-		
-		public event NotifyCollectionChangedEventHandler CollectionChanged;
 		
 		void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
 		{
 			Debug.Assert(!isRaisingEvent);
 			isRaisingEvent = true;
 			try {
-				parent.OnChildrenChanged(e);
+				Parent.OnChildrenChanged(e);
 				if (CollectionChanged != null)
 					CollectionChanged(this, e);
 			} finally {
@@ -35,13 +32,13 @@ namespace Bau.Controls.SharpTreeView
 			}
 		}
 		
-		void ThrowOnReentrancy()
+		private void ThrowOnReentrancy()
 		{
 			if (isRaisingEvent)
 				throw new InvalidOperationException();
 		}
 		
-		void ThrowIfValueIsNullOrHasParent(SharpTreeNode node)
+		private void ThrowIfValueIsNullOrHasParent(SharpTreeNode node)
 		{
 			if (node == null)
 				throw new ArgumentNullException("node");
@@ -51,40 +48,32 @@ namespace Bau.Controls.SharpTreeView
 		
 		public SharpTreeNode this[int index] {
 			get {
-				return list[index];
+				return Nodes[index];
 			}
 			set {
 				ThrowOnReentrancy();
-				var oldItem = list[index];
+				var oldItem = Nodes[index];
 				if (oldItem == value)
 					return;
 				ThrowIfValueIsNullOrHasParent(value);
-				list[index] = value;
+				Nodes[index] = value;
 				OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, oldItem, index));
 			}
 		}
 		
-		public int Count {
-			get { return list.Count; }
-		}
-		
-		bool ICollection<SharpTreeNode>.IsReadOnly {
-			get { return false; }
-		}
-		
 		public int IndexOf(SharpTreeNode node)
 		{
-			if (node == null || node.modelParent != parent)
+			if (node == null || node.modelParent != Parent)
 				return -1;
 			else
-				return list.IndexOf(node);
+				return Nodes.IndexOf(node);
 		}
 		
 		public void Insert(int index, SharpTreeNode node)
 		{
 			ThrowOnReentrancy();
 			ThrowIfValueIsNullOrHasParent(node);
-			list.Insert(index, node);
+			Nodes.Insert(index, node);
 			OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, node, index));
 		}
 		
@@ -99,15 +88,15 @@ namespace Bau.Controls.SharpTreeView
 			foreach (SharpTreeNode node in newNodes) {
 				ThrowIfValueIsNullOrHasParent(node);
 			}
-			list.InsertRange(index, newNodes);
+			Nodes.InsertRange(index, newNodes);
 			OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, newNodes, index));
 		}
 		
 		public void RemoveAt(int index)
 		{
 			ThrowOnReentrancy();
-			var oldItem = list[index];
-			list.RemoveAt(index);
+			var oldItem = Nodes[index];
+			Nodes.RemoveAt(index);
 			OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, oldItem, index));
 		}
 		
@@ -116,8 +105,8 @@ namespace Bau.Controls.SharpTreeView
 			ThrowOnReentrancy();
 			if (count == 0)
 				return;
-			var oldItems = list.GetRange(index, count);
-			list.RemoveRange(index, count);
+			var oldItems = Nodes.GetRange(index, count);
+			Nodes.RemoveRange(index, count);
 			OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, oldItems, index));
 		}
 		
@@ -125,20 +114,20 @@ namespace Bau.Controls.SharpTreeView
 		{
 			ThrowOnReentrancy();
 			ThrowIfValueIsNullOrHasParent(node);
-			list.Add(node);
-			OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, node, list.Count - 1));
+			Nodes.Add(node);
+			OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, node, Nodes.Count - 1));
 		}
 		
 		public void AddRange(IEnumerable<SharpTreeNode> nodes)
 		{
-			InsertRange(this.Count, nodes);
+			InsertRange(Count, nodes);
 		}
 		
 		public void Clear()
 		{
 			ThrowOnReentrancy();
-			var oldList = list;
-			list = new List<SharpTreeNode>();
+			var oldList = Nodes;
+			Nodes.Clear();
 			OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, oldList, 0));
 		}
 		
@@ -149,29 +138,30 @@ namespace Bau.Controls.SharpTreeView
 		
 		public void CopyTo(SharpTreeNode[] array, int arrayIndex)
 		{
-			list.CopyTo(array, arrayIndex);
+			Nodes.CopyTo(array, arrayIndex);
 		}
 		
 		public bool Remove(SharpTreeNode item)
 		{
 			int pos = IndexOf(item);
-			if (pos >= 0) {
+			if (pos >= 0) 
+			{
 				RemoveAt(pos);
 				return true;
-			} else {
+			} 
+			else
 				return false;
-			}
 		}
 		
-		public IEnumerator<SharpTreeNode> GetEnumerator()
-		{
-			return list.GetEnumerator();
-		}
+		/// <summary>
+		///		Obtiene el enumerador
+		/// </summary>
+		public IEnumerator<SharpTreeNode> GetEnumerator() => Nodes.GetEnumerator();
 		
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-		{
-			return list.GetEnumerator();
-		}
+		/// <summary>
+		///		Obtiene el enumerador
+		/// </summary>
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => Nodes.GetEnumerator();
 		
 		public void RemoveAll(Predicate<SharpTreeNode> match)
 		{
@@ -179,11 +169,11 @@ namespace Bau.Controls.SharpTreeView
 				throw new ArgumentNullException("match");
 			ThrowOnReentrancy();
 			int firstToRemove = 0;
-			for (int i = 0; i < list.Count; i++) {
+			for (int i = 0; i < Nodes.Count; i++) {
 				bool removeNode;
 				isRaisingEvent = true;
 				try {
-					removeNode = match(list[i]);
+					removeNode = match(Nodes[i]);
 				} finally {
 					isRaisingEvent = false;
 				}
@@ -197,9 +187,29 @@ namespace Bau.Controls.SharpTreeView
 					Debug.Assert(firstToRemove == i + 1);
 				}
 			}
-			if (firstToRemove < list.Count) {
-				RemoveRange(firstToRemove, list.Count - firstToRemove);
+			if (firstToRemove < Nodes.Count) {
+				RemoveRange(firstToRemove, Nodes.Count - firstToRemove);
 			}
 		}
+
+		/// <summary>
+		///		Nodo padre
+		/// </summary>
+		private SharpTreeNode Parent { get; }
+		
+		/// <summary>
+		///		Número de elementos de la lista
+		/// </summary>
+		public int Count => Nodes.Count;
+		
+		/// <summary>
+		///		Indica si la colección es de sólo lectura
+		/// </summary>
+		bool ICollection<SharpTreeNode>.IsReadOnly => false;
+
+		/// <summary>
+		///		Nodos de la lista
+		/// </summary>
+		private List<SharpTreeNode> Nodes { get; } = new();
 	}
 }

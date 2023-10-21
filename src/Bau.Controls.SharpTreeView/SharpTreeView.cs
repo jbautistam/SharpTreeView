@@ -8,7 +8,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Threading;
-
+using Bau.Controls.SharpTreeView.Adorners;
 using Bau.Controls.SharpTreeView.Models;
 
 namespace Bau.Controls.SharpTreeView
@@ -18,20 +18,6 @@ namespace Bau.Controls.SharpTreeView
     /// </summary>
     public class SharpTreeView : ListView
 	{
-		// Propiedades de dependencia
-		public static readonly DependencyProperty ShowLinesProperty = DependencyProperty.Register(nameof(ShowLines), typeof(bool), typeof(SharpTreeView),
-																								  new FrameworkPropertyMetadata(true));
-		public static readonly DependencyProperty AllowDropOrderProperty = DependencyProperty.Register(nameof(AllowDropOrder), typeof(bool), 
-																									   typeof(SharpTreeView));
-		public static readonly DependencyProperty RootProperty = DependencyProperty.Register(nameof(Root), typeof(SharpTreeNode), typeof(SharpTreeView));
-		public static readonly DependencyProperty ShowRootProperty = DependencyProperty.Register(nameof(ShowRoot), typeof(bool), typeof(SharpTreeView),
-																								 new FrameworkPropertyMetadata(true));
-		public static readonly DependencyProperty ShowRootExpanderProperty = DependencyProperty.Register(nameof(ShowRootExpander), typeof(bool), 
-																										 typeof(SharpTreeView),
-																										 new FrameworkPropertyMetadata(false));
-		public static readonly DependencyProperty ShowAlternationProperty = DependencyProperty.RegisterAttached("ShowAlternation", typeof(bool), typeof(SharpTreeView),
-																												new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.Inherits));
-		// Enumerados
 		/// <summary>
 		///		Lugar donde se coloca el elemento soltado
 		/// </summary>
@@ -44,12 +30,25 @@ namespace Bau.Controls.SharpTreeView
 			/// <summary>Después</summary>
 			After
 		}
+		// Propiedades de dependencia
+		public static readonly DependencyProperty ShowLinesProperty = DependencyProperty.Register(nameof(ShowLines), typeof(bool), typeof(SharpTreeView),
+																								  new FrameworkPropertyMetadata(true));
+		public static readonly DependencyProperty AllowDropOrderProperty = DependencyProperty.Register(nameof(AllowDropOrder), typeof(bool), 
+																									   typeof(SharpTreeView));
+		public static readonly DependencyProperty RootProperty = DependencyProperty.Register(nameof(Root), typeof(SharpTreeNode), typeof(SharpTreeView));
+		public static readonly DependencyProperty ShowRootProperty = DependencyProperty.Register(nameof(ShowRoot), typeof(bool), typeof(SharpTreeView),
+																								 new FrameworkPropertyMetadata(true));
+		public static readonly DependencyProperty ShowRootExpanderProperty = DependencyProperty.Register(nameof(ShowRootExpander), typeof(bool), 
+																										 typeof(SharpTreeView),
+																										 new FrameworkPropertyMetadata(false));
+		public static readonly DependencyProperty ShowAlternationProperty = DependencyProperty.RegisterAttached(nameof(ShowAlternation), 
+																												typeof(bool), typeof(SharpTreeView),
+																												new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.Inherits));
 		// Variables privadas
 		private TreeFlattenerCollection? _flattener;
 		private bool _doNotScrollOnExpanding;
 		private SharpTreeNodeView? _previewNodeView;
 		private InsertMarker? _insertMarker;
-		private DropPlace _previewPlace;
 
 		static SharpTreeView()
 		{
@@ -66,10 +65,8 @@ namespace Bau.Controls.SharpTreeView
 			                                           new CommandBinding(ApplicationCommands.Copy, HandleExecuted_Copy, HandleCanExecute_Copy));
 			CommandManager.RegisterClassCommandBinding(typeof(SharpTreeView),
 			                                           new CommandBinding(ApplicationCommands.Paste, HandleExecuted_Paste, HandleCanExecute_Paste));
-
 			CommandManager.RegisterClassCommandBinding(typeof(SharpTreeView),
 			                                           new CommandBinding(ApplicationCommands.Delete, HandleExecuted_Delete, HandleCanExecute_Delete));
-
 		}
 
 		public SharpTreeView()
@@ -596,8 +593,9 @@ namespace Bau.Controls.SharpTreeView
 
 		private void ShowPreview(SharpTreeViewItem? item, DropPlace place)
 		{
+			//DropPlace _previewPlace = place;
+
 			_previewNodeView = item?.NodeView;
-			_previewPlace = place;
 
 			if (place == DropPlace.Inside) 
 			{
@@ -606,15 +604,19 @@ namespace Bau.Controls.SharpTreeView
 			}
 			else 
 			{
-				if (_insertMarker == null) 
+				// Crea el marcador de inserción si es necesario
+				if (_insertMarker is null) 
 				{
 					AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer(this);
 					GeneralAdorner adorner = new GeneralAdorner(this);
-					_insertMarker = new InsertMarker();
-					adorner.Child = _insertMarker;
-					adornerLayer.Add(adorner);
-				}
 
+						// Crea el marcador
+						_insertMarker = new InsertMarker();
+						// Lo asigna al adorner
+						adorner.Child = _insertMarker;
+						adornerLayer.Add(adorner);
+				}
+				// Muestra el marcador
 				_insertMarker.Visibility = Visibility.Visible;
 
 				Point p1 = _previewNodeView.TransformToVisual(this).Transform(new Point());
@@ -866,6 +868,15 @@ namespace Bau.Controls.SharpTreeView
 		{
 			get { return (bool) GetValue(ShowLinesProperty); }
 			set { SetValue(ShowLinesProperty, value); }
+		}
+
+		/// <summary>
+		///		Activa / desactiva la alternancia de colores
+		/// </summary>
+		public bool ShowAlternation
+		{
+			get { return (bool) GetValue(ShowAlternationProperty); }
+			set { SetValue(ShowAlternationProperty, value); }
 		}
 	}
 }

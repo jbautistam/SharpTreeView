@@ -54,11 +54,13 @@ namespace Bau.Controls.SharpTreeView.Demo.Nodes
 
 		public override bool SaveEditText(string value)
 		{
-			if (value.Contains("?")) {
+			if (value.Contains("?")) 
+			{
 				MessageBox.Show("?");
 				return false;
 			}
-			else {
+			else 
+			{
 				_name = value;
 				return true;
 			}

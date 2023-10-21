@@ -106,7 +106,7 @@ namespace Bau.Controls.SharpTreeView
 			ReleaseMouseCapture();
 			// Si estaba seleccionado, se trata el evento base
 			if (_wasSelected)
-				base.OnMouseLeftButtonDown(e);
+				base.OnMouseLeftButtonUp(e);
 		}
 
 		/// <summary>
@@ -163,15 +163,6 @@ namespace Bau.Controls.SharpTreeView
 		/// <summary>
 		///		Datos del nodo
 		/// </summary>
-		public SharpTreeNode? Node
-		{
-			get 
-			{ 
-				if (DataContext is SharpTreeNode node)
-					return node;
-				else
-					return null; 
-			}
-		}
+		public SharpTreeNode? Node=> DataContext as SharpTreeNode;
 	}
 }

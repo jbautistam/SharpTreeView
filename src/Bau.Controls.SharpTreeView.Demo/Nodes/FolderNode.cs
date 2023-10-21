@@ -58,17 +58,15 @@ namespace Bau.Controls.SharpTreeView.Demo.Nodes
 
 		protected override void LoadChildren()
 		{
-			try {
-				foreach (var p in Directory.GetDirectories(_path)
-				         .OrderBy(d => Path.GetDirectoryName(d))) {
-					Children.Add(new FolderNode(p));
-				}
-				foreach (var p in Directory.GetFiles(_path)
-				         .OrderBy(f => Path.GetFileName(f))) {
-					Children.Add(new FileNode(p));
-				}
+			try
+			{
+				foreach (string path in Directory.GetDirectories(_path).OrderBy(Path.GetDirectoryName)) 
+					Children.Add(new FolderNode(path));
+				foreach (string file in Directory.GetFiles(_path).OrderBy(Path.GetFileName)) 
+					Children.Add(new FileNode(file));
 			}
-			catch {
+			catch 
+			{
 			}
 		}
 		
@@ -79,30 +77,22 @@ namespace Bau.Controls.SharpTreeView.Demo.Nodes
 		
 		public override void Paste(IDataObject data)
 		{
-			var paths = data.GetData(DataFormats.FileDrop) as string[];
-			if (paths != null) {
-				foreach (var p in paths) {
-					if (File.Exists(p)) {
-						Children.Add(new FileNode(p));
-					} else {
-						Children.Add(new FolderNode(p));
-					}
-				}
-			}
+			if (data.GetData(DataFormats.FileDrop) is string[] paths)
+				foreach (string path in paths) 
+					if (File.Exists(path)) 
+						Children.Add(new FileNode(path));
+					else 
+						Children.Add(new FolderNode(path));
 		}
 		
 		public override void Drop(DragEventArgs e, int index)
 		{
-			var paths = e.Data.GetData(DataFormats.FileDrop) as string[];
-			if (paths != null) {
-				foreach (var p in paths) {
-					if (File.Exists(p)) {
-						Children.Insert(index++, new FileNode(p));
-					} else {
-						Children.Insert(index++, new FolderNode(p));
-					}
-				}
-			}
+			if (e.Data.GetData(DataFormats.FileDrop) is string[] paths)
+				foreach (string path in paths) 
+					if (File.Exists(path)) 
+						Children.Insert(index++, new FileNode(path));
+					else 
+						Children.Insert(index++, new FolderNode(path));
 		}
 	}
 }
